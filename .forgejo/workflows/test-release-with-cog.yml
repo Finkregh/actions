@@ -38,4 +38,3 @@ jobs:
           python -c 'import setup_cog_config; result = setup_cog_config.setup_cog_config("test_cog.toml", "test-remote", "test-repo", "test-owner"); print("Changes made:", result)'
           # Clean up
           rm -f test_cog.toml
-          
