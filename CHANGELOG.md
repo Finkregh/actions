@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [3.1.2](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/a6cb8ceaaaf38ec9ef812ac7d3654a177c75776e..3.1.2) - 2025-11-02
+### Package updates
+- [hugo-build-rsync-0.3.2](actions/hugo-build-rsync) bumped to [hugo-build-rsync-0.3.2](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/hugo-build-rsync-0.3.1..hugo-build-rsync-0.3.2)
+- [release-with-cog-0.2.2](actions/release-with-cog) bumped to [release-with-cog-0.2.2](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/release-with-cog-0.2.1..release-with-cog-0.2.2)
+- [ci-0.2.1](.forgejo/workflows) bumped to [ci-0.2.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/ci-0.2.0..ci-0.2.1)
+### Global changes
+#### Miscellaneous Chores
+- test - ([a6cb8ce](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/commit/a6cb8ceaaaf38ec9ef812ac7d3654a177c75776e)) - finkregh
+
+- - -
+
 ## [3.1.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/3.1.0..3.1.1) - 1970-01-01
 ### Package updates
 - [hugo-build-rsync-0.3.1](actions/hugo-build-rsync) bumped to [hugo-build-rsync-0.3.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/hugo-build-rsync-0.3.0..hugo-build-rsync-0.3.1)

@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## ci-0.2.1 - 2025-11-02
+#### Continuous Integration
+- release via dispatch - (81bc74a) - finkregh
+#### Miscellaneous Chores
+- changes from ci - (b037d0d) - finkregh
+
+- - -
+
 ## ci-0.2.0 - 2025-10-04
 #### Features
 - **(hugo-build-rsync)** allow running commands before hugo build - (7eb2517) - Oluf Lorenzen

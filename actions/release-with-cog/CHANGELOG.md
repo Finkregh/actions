@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## release-with-cog-0.2.2 - 2025-11-02
+#### Miscellaneous Chores
+- print cog output - (54de170) - Oluf Lorenzen
+
+- - -
+
 ## release-with-cog-0.2.1 - 2025-10-01
 #### Miscellaneous Chores
 - **(deps)** update all dependencies - (f0ef8eb) - Renovate Bot
