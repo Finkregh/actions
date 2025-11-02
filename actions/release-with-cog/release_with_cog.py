@@ -316,6 +316,7 @@ def run_cog_command(args: list, working_dir: str = ".") -> str:
             text=True,
             check=True,
         )
+        print (f"DEBUG: cog output\n{result.stdout.strip()}")
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         error(f"Cog command failed: cog {' '.join(args)}")
