@@ -20,5 +20,14 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ steps.extract_branch.outputs.branch }}
+      - name: debug
+        run: |
+          echo "Branch extracted: ${{ steps.extract_branch.outputs.branch }}"
+          echo "All branches:"
+          git branch -a
+          echo "Current commit:"
+          git rev-parse HEAD
+          echo "git tree:"
+          git log --pretty=oneline --topo-order --graph --abbrev-commit
       - name: Generate release with changelog
         uses: ./actions/release-with-cog

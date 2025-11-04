@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - "actions/release-with-cog/setup_cog_config.py"
-      - ".github/workflows/test-release-with-cog.yml"
+      - ".forgejo/workflows/test-release-with-cog.yml"
 
 jobs:
   test-setup-cog-config:

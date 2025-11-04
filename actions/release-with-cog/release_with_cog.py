@@ -105,6 +105,28 @@ class ForgejoApiClient:
         response.raise_for_status()
         return response.json()
 
+    def get_pr_by_commit(
+        self,
+        owner: str,
+        repo: str,
+        commit_sha: str,
+    ) -> dict:
+        """Get pull request that contains the specified commit.
+
+        Args:
+            owner (str): Repository owner.
+            repo (str): Repository name.
+            commit_sha (str): Commit SHA.
+
+        Returns:
+            dict: Pull request information. See e.g. <https://codeberg.org/api/swagger#/definitions/PullRequest>
+
+        """
+        url = f"{self.base_url}/api/v1/repos/{owner}/{repo}/commits/{commit_sha}/pull"
+        response = self.session.get(url)
+        response.raise_for_status()
+        return response.json()
+
     def create_release(
         self,
         owner: str,
@@ -246,7 +268,15 @@ def setup_cog_configuration(
     owner: str,
     repo: str,
 ) -> None:
-    """Set up cog configuration if requested."""
+    """Set up cog configuration if requested.
+
+    Args:
+        inputs (dict[str, str]): Action inputs.
+        remote (str): Remote URL.
+        owner (str): Repository owner.
+        repo (str): Repository name.
+
+    """
     if inputs["update_cog_toml"].lower() != "true":
         return
 
@@ -316,7 +346,7 @@ def run_cog_command(args: list, working_dir: str = ".") -> str:
             text=True,
             check=True,
         )
-        print (f"DEBUG: cog output\n{result.stdout.strip()}")
+        debug(f"cog output:\n{result.stdout.strip()}")
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         error(f"Cog command failed: cog {' '.join(args)}")
@@ -416,8 +446,10 @@ def get_tag_prefix() -> str:
         with open("cog.toml", "rb") as f:
             config = tomllib.load(f)
         return config.get("tag_prefix", "")
-    except Exception:  # noqa: BLE001
-        info("No tag_prefix found in cog.toml, using empty prefix")
+    except Exception as e:  # noqa: BLE001
+        info(
+            f"No tag_prefix found in cog.toml (is it even there?), using empty prefix. Exception: {e}",
+        )
         return ""
 
 
@@ -466,7 +498,7 @@ def generate_changelog(  # noqa: PLR0913
     return changelog
 
 
-def post_pr_comment(  # noqa: PLR0913
+def post_pr_comment(  # noqa: C901, PLR0913, PLR0915
     inputs: dict[str, str],
     changelog: str,
     current_version: str,
@@ -474,7 +506,20 @@ def post_pr_comment(  # noqa: PLR0913
     owner: str,
     repo: str,
 ) -> tuple[str, str] | None:
-    """Post or update PR comment with changelog."""
+    """Post or update PR comment with changelog.
+
+    Args:
+        inputs (dict[str, str]): Action inputs.
+        changelog (str): Generated changelog.
+        current_version (str): Current version string.
+        previous_version (str): Previous version string.
+        owner (str): Repository owner.
+        repo (str): Repository name.
+
+    Returns:
+        tuple[str, str] | None: Tuple of (comment_id, comment_url) if successful, None otherwise.
+
+    """
     start_group("Post or update PR comment")
 
     try:
@@ -493,18 +538,40 @@ def post_pr_comment(  # noqa: PLR0913
             end_group()
             return None
 
-        if not pr_number:
-            error("PR number not available from GITHUB_EVENT_NUMBER")
-            end_group()
-            return None
-
         # Ensure server URL has protocol
         if not server_url.startswith(("http://", "https://")):
             server_url = f"https://{server_url}"
 
-        info(f"Posting comment to PR #{pr_number} in {owner}/{repo}")
+        # Create Forgejo API client
+        client = ForgejoApiClient(base_url=server_url, token=token)
 
-        # Create the comment body
+        if not pr_number:
+            # Try to get PR number via current commit SHA
+            info(
+                "PR number not available from GITHUB_EVENT_NUMBER, trying to find PR via commit SHA",
+            )
+
+            commit_sha = os.environ["FORGEJO_SHA"]
+            info(f"Current commit SHA: {commit_sha}")
+
+            # Try to find PR containing this commit
+            pr_data = client.get_pr_by_commit(
+                owner=owner,
+                repo=repo,
+                commit_sha=commit_sha,
+            )
+
+            if pr_data and "number" in pr_data:
+                pr_number = str(pr_data["number"])
+                info(f"Found PR #{pr_number} containing commit {commit_sha}")
+            else:
+                error(f"No PR found containing commit {commit_sha}")
+                end_group()
+                return None
+
+        info(
+            f"Posting comment to PR #{pr_number} in {owner}/{repo}",
+        )  # Create the comment body
         comment_header = inputs["comment_header"]
         comment_footer = inputs["comment_footer"]
 
@@ -517,9 +584,6 @@ def post_pr_comment(  # noqa: PLR0913
 {changelog}
 
 {comment_footer}"""
-
-        # Create Forgejo API client
-        client = ForgejoApiClient(base_url=server_url, token=token)
 
         # Check for existing comment
         comment_identifier = comment_header
@@ -546,7 +610,9 @@ def post_pr_comment(  # noqa: PLR0913
         # Post or update comment
         if existing_comment_id:
             # Update existing comment
-            info("Updating existing comment...")
+            info(
+                f"Updating existing comment: {server_url}/{owner}/{repo}/pulls/{pr_number}#issuecomment-{existing_comment_id}",
+            )
             response = client.edit_issue_comment(
                 owner=owner,
                 repo=repo,
