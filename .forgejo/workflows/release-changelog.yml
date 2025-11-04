@@ -27,7 +27,11 @@ jobs:
           git branch -a
           echo "Current commit:"
           git rev-parse HEAD
+          echo "origin/main..HEAD"
+          git diff origin/main..HEAD
+          echo git diff main
+          git diff --stat origin/main
           echo "git tree:"
-          git log --pretty=oneline --topo-order --graph --abbrev-commit
+          git log --pretty=oneline --topo-order --graph --abbrev-commit | head -n 20 || true
       - name: Generate release with changelog
         uses: ./actions/release-with-cog
