@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## hugo-build-rsync-0.3.3 - 2026-04-20
+#### Bug Fixes
+- (**hugo-build-rsync**) set output properly - (c73bf10) - Oluf Lorenzen
+
+- - -
+
 ## hugo-build-rsync-0.3.2 - 2025-11-02
 #### Miscellaneous Chores
 - changes from ci - (b037d0d) - finkregh

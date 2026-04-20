@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## ci-0.2.2 - 2025-11-04
+#### Bug Fixes
+- (**release-with-cog**) properly fetch PR ID - (4cf483b) - Oluf Lorenzen
+
+- - -
+
 ## ci-0.2.1 - 2025-11-02
 #### Continuous Integration
 - release via dispatch - (81bc74a) - finkregh
