@@ -189,6 +189,7 @@ runs:
         echo -e '\n```' >> "$GITHUB_STEP_SUMMARY"
 
         echo HUGO_BASEURL="${HUGO_BASEURL}" >> "${GITHUB_ENV}"
+        echo "site_url=${HUGO_BASEURL}" >> "${GITHUB_OUTPUT}"
         echo "::endgroup::"
 
     - name: Save Hugo resources
@@ -237,7 +238,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        echo "::notice::Build is accessible at ${{ steps.build.outputs.site_url }}" | tee -a "$GITHUB_STEP_SUMMARY"
+        echo "::notice::Build is accessible at ${HUGO_BASEURL}" | tee -a "$GITHUB_STEP_SUMMARY"
 
         # shellcheck disable=SC2050
         if [ "${{ github.event_name }}" == "pull_request" ]; then
