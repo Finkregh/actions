@@ -28,15 +28,15 @@ docs = { bump_patch = true }
 style = { bump_patch = true }
 perf = { bump_patch = true }
 
-[packages.ci]
+[monorepo.packages.ci]
 path = ".forgejo/workflows"
 public_api = false
 
-[packages.hugo-build-rsync]
+[monorepo.packages.hugo-build-rsync]
 path = "actions/hugo-build-rsync"
 
-[packages.prettier-markdown]
+[monorepo.packages.prettier-markdown]
 path = "actions/prettier-markdown"
 
-[packages.release-with-cog]
+[monorepo.packages.release-with-cog]
 path = "actions/release-with-cog"
