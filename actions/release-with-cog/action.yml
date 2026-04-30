@@ -90,15 +90,15 @@ runs:
   using: composite
   steps:
     - name: Configure Git User
-      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/configure-git-user@0.31.3
+      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/configure-git-user@613f8b1be709aae90bc082b1ea389887431b9ae3 # 0.31.3
     - name: Install yq
-      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/install-yq@0.31.3
+      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/install-yq@613f8b1be709aae90bc082b1ea389887431b9ae3 # 0.31.3
     - name: Install jq
-      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/install-jq@0.31.3
+      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/install-jq@613f8b1be709aae90bc082b1ea389887431b9ae3 # 0.31.3
     - name: Install cocogitto
-      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/install-cocogitto@0.31.3
+      uses: https://git.h.oluflorenzen.de/mirrors/codeberg.PurpleBooth.common-pipelines/actions/install-cocogitto@613f8b1be709aae90bc082b1ea389887431b9ae3 # 0.31.3
     - name: Install uv and python
-      uses: https://github.com/astral-sh/setup-uv@v6.8
+      uses: https://github.com/astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8
       with:
         enable-cache: true
         activate-environment: true

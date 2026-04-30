@@ -21,7 +21,7 @@ runs:
 
     - name: Checkout
       id: checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       with:
         fetch-depth: 1
         ref: ${{ steps.extract_branch.outputs.branch }}
@@ -47,7 +47,7 @@ runs:
 
     - name: Prettier
       #uses: https://github.com/creyD/prettier_action@v4.6
-      uses: https://github.com/creyD/prettier_action@dev
+      uses: https://github.com/creyD/prettier_action@c1711cdd30c9969824e5ce3e970aea111d9e894c # dev
       with:
         prettier_plugins: "prettier-plugin-toml"
         allow_other_plugins: true
@@ -56,7 +56,7 @@ runs:
         prettier_options: --write .
 
     - name: Markdownlint
-      uses: https://github.com/DavidAnson/markdownlint-cli2-action@v20
+      uses: https://github.com/DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20
       continue-on-error: true
       with:
         fix: true
@@ -76,7 +76,7 @@ runs:
       #if: >
       #  github.event_name == 'pull_request' &&
       #  github.ref_name != github.event.repository.default_branch
-      uses: https://github.com/stefanzweifel/git-auto-commit-action@v6.0.1
+      uses: https://github.com/stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
       with:
         branch: ${{ steps.extract_branch.outputs.branch }}
         commit_message: "chore: changes from ci"
@@ -87,6 +87,6 @@ runs:
         status_options: "--untracked-files=no"
 
     - name: Markdownlint (blocking)
-      uses: https://github.com/DavidAnson/markdownlint-cli2-action@v20
+      uses: https://github.com/DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20
       with:
         globs: "**/*.md"
