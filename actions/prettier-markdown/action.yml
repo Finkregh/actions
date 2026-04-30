@@ -76,7 +76,7 @@ runs:
       #if: >
       #  github.event_name == 'pull_request' &&
       #  github.ref_name != github.event.repository.default_branch
-      uses: https://github.com/stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
+      uses: https://github.com/stefanzweifel/git-auto-commit-action@v7.1.0
       with:
         branch: ${{ steps.extract_branch.outputs.branch }}
         commit_message: "chore: changes from ci"
@@ -85,6 +85,7 @@ runs:
         # file_pattern: "*"
         # skip_dirty_check: true
         status_options: "--untracked-files=no"
+        repository: .
 
     - name: Markdownlint (blocking)
       uses: https://github.com/DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20
