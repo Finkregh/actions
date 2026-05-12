@@ -726,7 +726,11 @@ def create_forgejo_release(
         if not server_url.startswith(("http://", "https://")):
             server_url = f"https://{server_url}"
 
-        info(f"Creating Forgejo release for {owner}/{repo} version {version}")
+        # Apply tag prefix to match the tag created by cog bump
+        tag_prefix = get_tag_prefix()
+        full_tag = f"{tag_prefix}{version}"
+
+        info(f"Creating Forgejo release for {owner}/{repo} tag {full_tag}")
 
         # Create Forgejo API client
         client = ForgejoApiClient(base_url=server_url, token=token)
@@ -735,22 +739,22 @@ def create_forgejo_release(
         response = client.create_release(
             owner=owner,
             repo=repo,
-            tag_name=version,
-            name=version,
+            tag_name=full_tag,
+            name=full_tag,
             body=changelog,
         )
 
         # Convert Release object to JSON string for output
         release_url = response.get(
             "html_url",
-            f"{server_url}/{owner}/{repo}/releases/tag/{version}",
+            f"{server_url}/{owner}/{repo}/releases/tag/{full_tag}",
         )
         info(f"Forgejo release created successfully: {release_url}")
 
         # Create a simple dict representation for JSON output
         release_dict = {
-            "tag_name": version,
-            "name": version,
+            "tag_name": full_tag,
+            "name": full_tag,
             "body": changelog,
             "html_url": release_url,
             "id": response.get("id"),
