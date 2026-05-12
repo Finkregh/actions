@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## release-with-cog-0.3.1 - 2026-05-12
+#### Bug Fixes
+- (**release-with-cog**) set release prefix=prefix from config - (5b879e7) - Oluf Lorenzen
+
+- - -
+
 ## release-with-cog-0.3.0 - 2026-05-12
 #### Features
 - (**release-with-cog**) allow passing different args - (c146ec8) - Oluf Lorenzen
