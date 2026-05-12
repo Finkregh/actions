@@ -63,7 +63,8 @@ This action is a fork from [PurpleBooth/common-pipelines](https://codeberg.org/P
 | `dry-run`                       | If true, no git tag or commit will be created when on main branch                                 | No       | `"false"`                                    |
 | `dry-run-on-non-default-branch` | If true, no git tag or commit will be created when on e.g. feature branch                         | No       | `"true"`                                     |
 | `cog_bump_args`                 | Additional arguments to pass to `cog bump`, e.g. `--major` or `--minor`                           | No       | `""`                                         |
-| `cog_changelog_args`            | Additional arguments to pass to `cog changelog`, e.g. `--unreleased`                              | No       | `""`                                         |
+| `cog_changelog_args`            | Additional arguments to pass to `cog changelog` on main branch releases, e.g. `--template remote` | No       | `"--template remote"`                        |
+| `cog_changelog_args_pr`         | Additional arguments to pass to `cog changelog` on PR events. Falls back to `cog_changelog_args`  | No       | `""`                                         |
 | `remote`                        | Remote server name for changelog generation (e.g., github.com, forgejo.example.com)               | No       | Auto-detected from `GITHUB_SERVER_URL`       |
 | `owner`                         | Repository owner for changelog generation                                                         | No       | Auto-detected from `GITHUB_REPOSITORY_OWNER` |
 | `repo`                          | Repository name for changelog generation                                                          | No       | Auto-detected from `GITHUB_REPOSITORY`       |

@@ -196,6 +196,7 @@ def get_action_inputs() -> dict[str, str]:
         or "true",
         "cog_bump_args": get_user_input("cog_bump_args") or "",
         "cog_changelog_args": get_user_input("cog_changelog_args") or "",
+        "cog_changelog_args_pr": get_user_input("cog_changelog_args_pr") or "",
         "remote": get_user_input("remote") or "",
         "owner": get_user_input("owner") or "",
         "repo": get_user_input("repo") or "",
@@ -500,8 +501,10 @@ def generate_changelog(  # noqa: PLR0913
     start_group("Generate changelog")
     args = ["changelog"]
 
-    # Add user-specified changelog arguments
-    if inputs["cog_changelog_args"].strip():
+    # Add user-specified changelog arguments (PR-specific args take precedence during PR events)
+    if is_pr_event and inputs["cog_changelog_args_pr"].strip():
+        args.extend(inputs["cog_changelog_args_pr"].strip().split())
+    elif inputs["cog_changelog_args"].strip():
         args.extend(inputs["cog_changelog_args"].strip().split())
 
     # Add remote, owner, repo if available

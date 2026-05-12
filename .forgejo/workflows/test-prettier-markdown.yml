@@ -1,10 +1,6 @@
 name: Test Action
 
 on:
-  push:
-    paths:
-      - "actions/prettier-markdown/action.yml"
-      - ".github/workflows/test-action.yml"
   pull_request:
     paths:
       - "actions/prettier-markdown/action.yml"

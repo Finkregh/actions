@@ -23,4 +23,4 @@ jobs:
       - name: Generate release with changelog
         uses: ./actions/release-with-cog
         with:
-          cog_changelog_args: "--unified"
+          cog_changelog_args_pr: "--unified"
