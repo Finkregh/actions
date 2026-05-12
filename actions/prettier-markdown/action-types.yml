@@ -2,3 +2,19 @@
 inputs:
   prettier_plugins:
     type: string
+  prettier_options:
+    type: string
+  markdownlint_globs:
+    type: string
+  skip_checkout:
+    type: boolean
+  skip_commit:
+    type: boolean
+  commit_message:
+    type: string
+  commit_user_name:
+    type: string
+  commit_user_email:
+    type: string
+  commit_author:
+    type: string

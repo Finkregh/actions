@@ -9,6 +9,38 @@ inputs:
     description: 'Additional prettier plugins to install, space-separated, e.g. "prettier-plugin-toml prettier-plugin-sh prettier-plugin-merge"'
     required: false
     default: "prettier-plugin-toml prettier-plugin-sh prettier-plugin-merge"
+  prettier_options:
+    description: "Prettier CLI options"
+    required: false
+    default: "--write ."
+  markdownlint_globs:
+    description: "Glob pattern for markdownlint"
+    required: false
+    default: "**/*.md"
+  skip_checkout:
+    description: "Skip the checkout step (useful when calling the action from a workflow that already checked out the code)"
+    required: false
+    default: "false"
+  skip_commit:
+    description: "Skip the commit and push step"
+    required: false
+    default: "false"
+  commit_message:
+    description: "Commit message for the auto-commit"
+    required: false
+    default: "chore: changes from ci"
+  commit_user_name:
+    description: "Git user name for the auto-commit"
+    required: false
+    default: "ci-linting"
+  commit_user_email:
+    description: "Git user email for the auto-commit"
+    required: false
+    default: ""
+  commit_author:
+    description: "Git author for the auto-commit"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -21,46 +53,65 @@ runs:
 
     - name: Checkout
       id: checkout
+      if: inputs.skip_checkout != 'true'
       uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       with:
         fetch-depth: 1
         ref: ${{ steps.extract_branch.outputs.branch }}
 
-    - name: install prettier-plugins
+    - name: Prettier
       shell: bash
-      # workaround for <https://github.com/creyD/prettier_action/issues/111>
       run: |
-        echo "::group::Install prettier plugins"
-        npm install prettier --save-dev
-        # shellcheck disable=SC2157
-        if [ -z "${{ inputs.prettier_plugins }}" ]; then
-          echo "No additional prettier plugins specified."
-        else
-          echo "Installing additional prettier plugins: ${{ inputs.prettier_plugins }}"
-          # shellcheck disable=SC2043
-          for plugin in ${{ inputs.prettier_plugins }}; do
-            echo "Installing plugin: $plugin"
-            npm install "$plugin" --save-dev
-          done
-        fi
+        echo "::group::Install prettier and plugins"
+        PRETTIER_DIR=$(mktemp -d)
+        pushd "$PRETTIER_DIR"
+        npm init -y > /dev/null 2>&1
+        npm install prettier ${{ inputs.prettier_plugins }}
+        popd
         echo "::endgroup::"
 
-    - name: Prettier
-      #uses: https://github.com/creyD/prettier_action@v4.6
-      uses: https://github.com/creyD/prettier_action@c1711cdd30c9969824e5ce3e970aea111d9e894c # dev
-      with:
-        prettier_plugins: "prettier-plugin-toml"
-        allow_other_plugins: true
-        no_commit: true
-        add_options: "--update"
-        prettier_options: --write .
+        echo "::group::Prettifying files..."
+        PLUGINS_REQUIRE=""
+        PLUGINS_DISPLAY="["
+        FIRST=true
+        for plugin in ${{ inputs.prettier_plugins }}; do
+          if [ "$FIRST" = true ]; then
+            PLUGINS_REQUIRE="    require.resolve(\"$plugin\")"
+            PLUGINS_DISPLAY="$PLUGINS_DISPLAY\"$plugin\""
+            FIRST=false
+          else
+            PLUGINS_REQUIRE="$PLUGINS_REQUIRE,\n    require.resolve(\"$plugin\")"
+            PLUGINS_DISPLAY="$PLUGINS_DISPLAY, \"$plugin\""
+          fi
+        done
+        PLUGINS_DISPLAY="$PLUGINS_DISPLAY]"
+
+        GENERATED_CONFIG=false
+        CONFIG_PATH=$("$PRETTIER_DIR/node_modules/.bin/prettier" --find-config-path .prettier 2>&1 || true)
+        if echo "$CONFIG_PATH" | grep -q 'Can not find configure file for'; then
+          echo "No existing prettier config found, generating .prettierrc.cjs"
+          printf 'module.exports = {\n  plugins: [\n%b\n  ],\n};\n' "$PLUGINS_REQUIRE" > .prettierrc.cjs
+          cat .prettierrc.cjs
+          GENERATED_CONFIG=true
+        else
+          echo "Existing prettier config found: $CONFIG_PATH"
+          echo "::warning::Ensure your prettier config includes the plugins: $PLUGINS_DISPLAY"
+        fi
+
+        NODE_PATH="$PRETTIER_DIR/node_modules" "$PRETTIER_DIR/node_modules/.bin/prettier" ${{ inputs.prettier_options }}
+
+        if [ "$GENERATED_CONFIG" = true ]; then
+          rm -f .prettierrc.cjs
+        fi
+        rm -rf "$PRETTIER_DIR"
+        echo "::endgroup::"
 
     - name: Markdownlint
       uses: https://github.com/DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20
       continue-on-error: true
       with:
         fix: true
-        globs: "**/*.md"
+        globs: ${{ inputs.markdownlint_globs }}
 
     - name: Git diff and status
       shell: sh
@@ -70,24 +121,19 @@ runs:
         echo "::endgroup::"
 
     - name: Commit and push linting fixes
-      # Run only on:
-      # - Pull requests
-      # - Not on the default branch
-      #if: >
-      #  github.event_name == 'pull_request' &&
-      #  github.ref_name != github.event.repository.default_branch
+      if: inputs.skip_commit != 'true'
       uses: https://github.com/stefanzweifel/git-auto-commit-action@v7.1.0
       with:
         branch: ${{ steps.extract_branch.outputs.branch }}
-        commit_message: "chore: changes from ci"
-        commit_user_name: ci-linting
+        commit_message: ${{ inputs.commit_message }}
+        commit_user_name: ${{ inputs.commit_user_name }}
+        commit_user_email: ${{ inputs.commit_user_email || '' }}
+        commit_author: ${{ inputs.commit_author || '' }}
         add_options: "--update"
-        # file_pattern: "*"
-        # skip_dirty_check: true
         status_options: "--untracked-files=no"
         repository: .
 
     - name: Markdownlint (blocking)
       uses: https://github.com/DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20
       with:
-        globs: "**/*.md"
+        globs: ${{ inputs.markdownlint_globs }}

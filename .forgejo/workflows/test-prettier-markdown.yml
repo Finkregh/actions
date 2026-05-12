@@ -35,11 +35,6 @@ jobs:
           -   Item 1
           -    Item 2
           -     Item 3
-
-          Some code:
-          ```javascript
-          const x=1;const y=2;
-          ```
           EOF
 
           # Create a poorly formatted TOML file
@@ -63,7 +58,34 @@ jobs:
           echo "=== Files before formatting ==="
           find test-files -type f -exec echo "--- {} ---" \; -exec cat {} \;
 
-      - name: Test the action
+      - name: Create prettierrc with plugins
+        run: |
+          cat > .prettierrc.cjs << 'EOF'
+          module.exports = {
+            plugins: [
+              require.resolve("prettier-plugin-toml"),
+              require.resolve("prettier-plugin-sh")
+            ],
+          };
+          EOF
+          cat .prettierrc.cjs
+
+      - name: Rename config away (simulate no config)
+        run: mv .prettierrc.cjs testing-rename-prettierconfig
+
+      - name: Test the action without config (should succeed via generated config)
+        uses: ./actions/prettier-markdown
+        with:
+          prettier_plugins: "prettier-plugin-toml prettier-plugin-sh"
+          prettier_options: "--write test-files/**/*"
+          markdownlint_globs: "test-files/**/*.md"
+          skip_commit: "true"
+          skip_checkout: "true"
+
+      - name: Rename config back
+        run: mv testing-rename-prettierconfig .prettierrc.cjs
+
+      - name: Test the action with existing config (should succeed)
         uses: ./actions/prettier-markdown
         with:
           prettier_plugins: "prettier-plugin-toml prettier-plugin-sh"
@@ -71,6 +93,7 @@ jobs:
           markdownlint_globs: "test-files/**/*.md"
           commit_message: "test: formatting changes"
           skip_commit: "true"
+          skip_checkout: "true"
 
       - name: Show files after formatting
         run: |
@@ -130,6 +153,7 @@ jobs:
           commit_user_email: "test@example.com"
           commit_author: "Test Bot <test@example.com>"
           skip_commit: "true"
+          skip_checkout: "true"
 
   test-action-minimal:
     runs-on: ubuntu-latest
@@ -150,6 +174,7 @@ jobs:
           prettier_options: "--write test-minimal/**/*"
           markdownlint_globs: "test-minimal/**/*.md"
           skip_commit: "true"
+          skip_checkout: "true"
 
   test-skip-commit-functionality:
     runs-on: ubuntu-latest
@@ -170,6 +195,7 @@ jobs:
           prettier_options: "--write test-skip-commit/**/*"
           markdownlint_globs: "test-skip-commit/**/*.md"
           skip_commit: "true"
+          skip_checkout: "true"
 
       - name: Verify no commit was made
         run: |
