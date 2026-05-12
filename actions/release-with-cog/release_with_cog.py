@@ -12,6 +12,7 @@ import logging
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 try:
     import requests
@@ -151,6 +152,39 @@ def is_pull_request_event() -> bool:
     """Check if running on a pull request event."""
     event_name = get_env("GITHUB_EVENT_NAME")
     return event_name == "pull_request"
+
+
+def _get_pr_number_from_event() -> str | None:
+    """Extract PR number from the GitHub/Forgejo event payload.
+
+    Reads the event JSON from GITHUB_EVENT_PATH and extracts the PR number.
+
+    Returns:
+        str | None: PR number as string, or None if not available.
+
+    """
+    event_path = get_env("GITHUB_EVENT_PATH")
+    if not event_path or not Path(event_path).is_file():
+        debug(f"GITHUB_EVENT_PATH not set or file not found: {event_path}")
+        return None
+
+    try:
+        with open(event_path, encoding="utf-8") as f:
+            event_data = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        debug(f"Failed to read event payload: {e}")
+        return None
+
+    # For pull_request events, the number is at event.number or event.pull_request.number
+    pr_number = event_data.get("number")
+    if pr_number:
+        return str(pr_number)
+
+    pr_obj = event_data.get("pull_request", {})
+    if pr_obj and pr_obj.get("number"):
+        return str(pr_obj["number"])
+
+    return None
 
 
 def get_action_inputs() -> dict[str, str]:
@@ -498,7 +532,7 @@ def generate_changelog(  # noqa: PLR0913
     return changelog
 
 
-def post_pr_comment(  # noqa: C901, PLR0913, PLR0915
+def post_pr_comment(  # noqa: C901, PLR0912, PLR0913, PLR0915
     inputs: dict[str, str],
     changelog: str,
     current_version: str,
@@ -526,7 +560,7 @@ def post_pr_comment(  # noqa: C901, PLR0913, PLR0915
         # Get required environment variables
         token = inputs["forgejo_token"]
         server_url = inputs["forgejo_server_url"]
-        pr_number = get_env("GITHUB_EVENT_NUMBER")
+        pr_number = _get_pr_number_from_event()
 
         if not token:
             error("Forgejo token not available")
@@ -547,19 +581,26 @@ def post_pr_comment(  # noqa: C901, PLR0913, PLR0915
 
         if not pr_number:
             # Try to get PR number via current commit SHA
-            info(
-                "PR number not available from GITHUB_EVENT_NUMBER, trying to find PR via commit SHA",
-            )
+            commit_sha = get_env("GITHUB_SHA")
+            if not commit_sha:
+                error("No PR number from event payload and GITHUB_SHA not available")
+                end_group()
+                return None
 
-            commit_sha = os.environ["FORGEJO_SHA"]
-            info(f"Current commit SHA: {commit_sha}")
+            info(
+                f"PR number not available from event payload, trying to find PR via commit SHA: {commit_sha}",
+            )
 
             # Try to find PR containing this commit
-            pr_data = client.get_pr_by_commit(
-                owner=owner,
-                repo=repo,
-                commit_sha=commit_sha,
-            )
+            try:
+                pr_data = client.get_pr_by_commit(
+                    owner=owner,
+                    repo=repo,
+                    commit_sha=commit_sha,
+                )
+            except Exception as e:  # noqa: BLE001
+                warning(f"Failed to look up PR by commit SHA: {e}")
+                pr_data = None
 
             if pr_data and "number" in pr_data:
                 pr_number = str(pr_data["number"])
