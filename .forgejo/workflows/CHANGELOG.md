@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## ci-0.4.0 - 2026-05-12
+#### Features
+- (**release-with-cog**) allow passing different args - (c146ec8) - Oluf Lorenzen
+
+- - -
+
 ## ci-0.3.0 - 2026-05-12
 #### Features
 - (**prettier-markdown**) add new options - (644c001) - Oluf Lorenzen

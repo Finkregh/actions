@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## release-with-cog-0.3.0 - 2026-05-12
+#### Features
+- (**release-with-cog**) allow passing different args - (c146ec8) - Oluf Lorenzen
+
+- - -
+
 ## release-with-cog-0.2.4 - 2026-05-12
 #### Bug Fixes
 - (**release-with-cog**) properly detect PR details - (f64a713) - Oluf Lorenzen
