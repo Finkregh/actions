@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## prettier-markdown-0.1.0 - 2026-05-12
+#### Features
+- (**prettier-markdown**) add new options - (644c001) - Oluf Lorenzen
+#### Miscellaneous Chores
+- (**deps**) pin dependencies - (de6001b) - Renovate Bot
+- (**prettier-markdown**) bump deps - (62ea454) - finkregh
+
+- - -
+
 ## prettier-markdown-0.0.1 - 2025-10-01
 #### Continuous Integration
 - cleanup markdownlint config - (b52b5e0) - Oluf Lorenzen

@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## release-with-cog-0.2.4 - 2026-05-12
+#### Bug Fixes
+- (**release-with-cog**) properly detect PR details - (f64a713) - Oluf Lorenzen
+- (**release-with-cog**) use action directory from variable - (d25cac2) - Oluf Lorenzen
+#### Miscellaneous Chores
+- (**deps**) pin dependencies - (de6001b) - Renovate Bot
+
+- - -
+
 ## release-with-cog-0.2.3 - 2025-11-04
 #### Bug Fixes
 - (**release-with-cog**) properly fetch PR ID - (4cf483b) - Oluf Lorenzen

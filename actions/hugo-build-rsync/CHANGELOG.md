@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## hugo-build-rsync-0.3.4 - 2026-04-30
+#### Miscellaneous Chores
+- (**deps**) pin dependencies - (de6001b) - Renovate Bot
+
+- - -
+
 ## hugo-build-rsync-0.3.3 - 2026-04-20
 #### Bug Fixes
 - (**hugo-build-rsync**) set output properly - (c73bf10) - Oluf Lorenzen

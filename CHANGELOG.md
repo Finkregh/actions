@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [3.2.0](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/644c00188f8bbec1ac6e1bc9932f97cbf7841612..3.2.0) - 2026-05-12
+### Package updates
+- [prettier-markdown-0.1.0](actions/prettier-markdown) bumped to [prettier-markdown-0.1.0](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/prettier-markdown-0.0.1..prettier-markdown-0.1.0)
+- [hugo-build-rsync-0.3.4](actions/hugo-build-rsync) bumped to [hugo-build-rsync-0.3.4](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/hugo-build-rsync-0.3.3..hugo-build-rsync-0.3.4)
+- [ci-0.3.0](.forgejo/workflows) bumped to [ci-0.3.0](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/ci-0.2.2..ci-0.3.0)
+- [release-with-cog-0.2.4](actions/release-with-cog) bumped to [release-with-cog-0.2.4](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/release-with-cog-0.2.3..release-with-cog-0.2.4)
+### Global changes
+#### Features
+- (**prettier-markdown**) add new options - ([644c001](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/commit/644c00188f8bbec1ac6e1bc9932f97cbf7841612)) - Oluf Lorenzen
+
+- - -
+
 ## [3.1.3](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/cf5e162ecb3d49da7c0dd1b16af634906a53b108..3.1.3) - 2026-04-20
 ### Package updates
 - [hugo-build-rsync-0.3.3](actions/hugo-build-rsync) bumped to [hugo-build-rsync-0.3.3](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/hugo-build-rsync-0.3.2..hugo-build-rsync-0.3.3)

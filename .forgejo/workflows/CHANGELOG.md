@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## ci-0.3.0 - 2026-05-12
+#### Features
+- (**prettier-markdown**) add new options - (644c001) - Oluf Lorenzen
+#### Continuous Integration
+- show unified changelog in PR - (28ed882) - Oluf Lorenzen
+#### Miscellaneous Chores
+- (**deps**) pin dependencies - (de6001b) - Renovate Bot
+
+- - -
+
 ## ci-0.2.2 - 2025-11-04
 #### Bug Fixes
 - (**release-with-cog**) properly fetch PR ID - (4cf483b) - Oluf Lorenzen
