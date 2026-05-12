@@ -22,3 +22,5 @@ jobs:
           ref: ${{ steps.extract_branch.outputs.branch }}
       - name: Generate release with changelog
         uses: ./actions/release-with-cog
+        with:
+          cog_changelog_args: "--unified"
