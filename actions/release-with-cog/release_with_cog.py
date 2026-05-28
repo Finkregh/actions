@@ -390,16 +390,22 @@ def run_cog_command(args: list, working_dir: str = ".") -> str:
         raise ReleaseWithCogError(msg) from e
 
 
-def get_cog_version(working_dir: str) -> str:
-    """Get current version from cog."""
+def get_cog_version(working_dir: str, *, changelog_exists: bool = True) -> str:
+    """Get current version from cog.
+
+    If no changelog exists, return "0.0.0" as default version.
+    """
     start_group("Determine previous version")
 
+    if not changelog_exists:
+        return "0.0.0"
     try:
         version = run_cog_command(["get-version"], working_dir)
         info(f"Current version: {version}")
         end_group()
         return version  # noqa: TRY300
-    except ReleaseWithCogError:
+    except ReleaseWithCogError as e:
+        warning(f"Failed to get version from cog: {e}")
         end_group()
         return ""
 
@@ -778,6 +784,11 @@ def main() -> None:
         is_pr = is_pull_request_event()
         info(f"Event type: {'Pull Request' if is_pr else 'Main Branch'}")
 
+        changelog_exists = Path("CHANGELOG.md").is_file()
+        if not changelog_exists:
+            warning("No CHANGELOG.md found in the repository. Setting version to 0.0.0")
+            set_output("previous_version", "0.0.0")
+
         # Get action inputs
         inputs = get_action_inputs()
 
@@ -792,7 +803,7 @@ def main() -> None:
             info("Processing PR event - generating changelog and posting comment")
 
             # Get current and previous versions for display
-            current_version = get_cog_version(working_dir=working_dir)
+            current_version = get_cog_version(working_dir=working_dir, changelog_exists=changelog_exists)
             previous_version = current_version  # For PRs, we don't bump version
 
             # Generate changelog for PR
@@ -844,7 +855,7 @@ def main() -> None:
             )
 
             # Get previous version
-            previous_version = get_cog_version(working_dir=working_dir)
+            previous_version = get_cog_version(working_dir=working_dir, changelog_exists=changelog_exists)
             set_output(name="previous_version", value=previous_version)
 
             # Bump version
