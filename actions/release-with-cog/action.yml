@@ -113,9 +113,8 @@ runs:
       shell: bash
       run: |
         git status
-        git branch
+        git branch -a
         git log -10 --oneline
-        ls -la
         pwd
     - name: Run release-with-cog Python script
       id: release_with_cog
