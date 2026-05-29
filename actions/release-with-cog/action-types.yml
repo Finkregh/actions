@@ -22,6 +22,8 @@ inputs:
     type: boolean
   pr_changelog_pattern:
     type: string
+  dev_version_suffix:
+    type: string
   comment_header:
     type: string
   comment_footer:
@@ -32,6 +34,8 @@ inputs:
     type: string
 outputs:
   current_version:
+    type: string
+  next_dev_version:
     type: string
   previous_version:
     type: string
