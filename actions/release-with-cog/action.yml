@@ -64,6 +64,10 @@ inputs:
     description: "Forgejo server URL for API calls"
     required: false
     default: "${{ env.GITHUB_SERVER_URL }}"
+  dev_version_suffix:
+    description: "Suffix to append to dev versions (e.g., '_dev', '-dev')"
+    required: false
+    default: "_dev"
 outputs:
   current_version:
     value: ${{ steps.release_with_cog.outputs.current_version }}
@@ -89,6 +93,9 @@ outputs:
   comment_url:
     value: ${{ steps.release_with_cog.outputs.comment_url }}
     description: "URL of the created or updated comment (PR events only)"
+  next_dev_version:
+    value: ${{ steps.release_with_cog.outputs.next_dev_version }}
+    description: "Next development version with suffix (PR events only)"
 
 runs:
   using: composite

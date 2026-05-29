@@ -10,6 +10,7 @@ creation using Python libraries instead of complex bash scripting.
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -390,16 +391,73 @@ def run_cog_command(args: list, working_dir: str = ".") -> str:
         raise ReleaseWithCogError(msg) from e
 
 
-def get_cog_version(working_dir: str) -> str:
-    """Get current version from cog."""
+def get_cog_version(working_dir: str, *, changelog_exists: bool = True) -> str:
+    """Get current version from cog.
+
+    If no changelog exists, return "0.0.0" as default version.
+    """
     start_group("Determine previous version")
 
+    if not changelog_exists:
+        return "0.0.0"
     try:
         version = run_cog_command(["get-version"], working_dir)
         info(f"Current version: {version}")
         end_group()
         return version  # noqa: TRY300
-    except ReleaseWithCogError:
+    except ReleaseWithCogError as e:
+        warning(f"Failed to get version from cog: {e}")
+        end_group()
+        return ""
+
+
+def compute_next_dev_version(working_dir: str, dev_version_suffix: str = "_dev") -> str:
+    """Compute the next development version with suffix.
+
+    Args:
+        working_dir: Working directory for cog commands
+        dev_version_suffix: Suffix to append to dev version (default: "_dev")
+
+    Returns:
+        Next development version with suffix (e.g., "1.2.4_dev")
+        Returns empty string if computation fails
+
+    """
+    start_group("Compute next dev version")
+
+    try:
+        # Try to get next patch version using dry-run
+        result = subprocess.run(
+            ["cog", "bump", "--patch", "--dry-run"],
+            check=False,
+            cwd=working_dir,
+            capture_output=True,
+            text=True,
+        )
+
+        if result.returncode == 0 and result.stdout.strip():
+            next_version = result.stdout.strip()
+            # Validate semver pattern
+            if re.match(r"^\d+\.\d+\.\d+$", next_version):
+                dev_version = f"{next_version}{dev_version_suffix}"
+                info(f"Next dev version: {dev_version}")
+                end_group()
+                return dev_version
+
+        # Fallback: use current version with suffix
+        current_version = get_cog_version(working_dir=working_dir, changelog_exists=True)
+        if current_version and re.match(r"^\d+\.\d+\.\d+$", current_version):
+            dev_version = f"{current_version}{dev_version_suffix}"
+            info(f"Next dev version (fallback to current): {dev_version}")
+            end_group()
+            return dev_version
+
+        warning("Failed to compute next dev version")
+        end_group()
+        return ""
+
+    except Exception as e:
+        warning(f"Error computing next dev version: {e}")
         end_group()
         return ""
 
@@ -778,6 +836,11 @@ def main() -> None:
         is_pr = is_pull_request_event()
         info(f"Event type: {'Pull Request' if is_pr else 'Main Branch'}")
 
+        changelog_exists = Path("CHANGELOG.md").is_file()
+        if not changelog_exists:
+            warning("No CHANGELOG.md found in the repository. Setting version to 0.0.0")
+            set_output("previous_version", "0.0.0")
+
         # Get action inputs
         inputs = get_action_inputs()
 
@@ -792,7 +855,7 @@ def main() -> None:
             info("Processing PR event - generating changelog and posting comment")
 
             # Get current and previous versions for display
-            current_version = get_cog_version(working_dir=working_dir)
+            current_version = get_cog_version(working_dir=working_dir, changelog_exists=changelog_exists)
             previous_version = current_version  # For PRs, we don't bump version
 
             # Generate changelog for PR
@@ -805,10 +868,18 @@ def main() -> None:
                 is_pr_event=True,
             )
 
+            # Compute next dev version
+            dev_version_suffix = inputs.get("dev_version_suffix", "_dev")
+            next_dev_version = compute_next_dev_version(
+                working_dir=working_dir,
+                dev_version_suffix=dev_version_suffix,
+            )
+
             # Set outputs
             set_output("previous_version", previous_version)
             set_output("current_version", current_version)
             set_output("changelog", changelog)
+            set_output("next_dev_version", next_dev_version)
 
             # Post PR comment
             comment_result = post_pr_comment(
@@ -844,7 +915,7 @@ def main() -> None:
             )
 
             # Get previous version
-            previous_version = get_cog_version(working_dir=working_dir)
+            previous_version = get_cog_version(working_dir=working_dir, changelog_exists=changelog_exists)
             set_output(name="previous_version", value=previous_version)
 
             # Bump version
