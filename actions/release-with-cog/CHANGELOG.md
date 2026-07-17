@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## release-with-cog-0.4.0 - 2026-07-17
+#### Features
+- (**release-with-cog**) handle initial release gracefully (no tags, no CHANGELOG) - (0a664d9) - Oluf Lorenzen
+- (**release-with-cog**) allow setting version suffix in PRs - (fb39be6) - Oluf Lorenzen
+- (**release-with-cog**) allow running without changelog - (559260e) - Oluf Lorenzen
+#### Continuous Integration
+- debug - (5dabc47) - finkregh
+
+- - -
+
 ## release-with-cog-0.3.1 - 2026-05-12
 #### Bug Fixes
 - (**release-with-cog**) set release prefix=prefix from config - (5b879e7) - Oluf Lorenzen

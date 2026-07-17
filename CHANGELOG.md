@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [3.4.0](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/3.3.1..3.4.0) - 1970-01-01
+### Package updates
+- [release-with-cog-0.4.0](actions/release-with-cog) bumped to [release-with-cog-0.4.0](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/release-with-cog-0.3.1..release-with-cog-0.4.0)
+### Global changes
+
+- - -
+
 ## [3.3.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/3.3.0..3.3.1) - 1970-01-01
 ### Package updates
 - [release-with-cog-0.3.1](actions/release-with-cog) bumped to [release-with-cog-0.3.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/release-with-cog-0.3.0..release-with-cog-0.3.1)
