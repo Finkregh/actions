@@ -10,6 +10,8 @@ inputs:
     type: string
   cog_changelog_args:
     type: string
+  cog_changelog_args_pr:
+    type: string
   remote:
     type: string
   owner:

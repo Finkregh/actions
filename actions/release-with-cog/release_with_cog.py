@@ -391,24 +391,23 @@ def run_cog_command(args: list, working_dir: str = ".") -> str:
         raise ReleaseWithCogError(msg) from e
 
 
-def get_cog_version(working_dir: str, *, changelog_exists: bool = True) -> str:
-    """Get current version from cog.
+def get_cog_version(working_dir: str) -> str:
+    """Get current version from cog using --fallback 0.0.0.
 
-    If no changelog exists, return "0.0.0" as default version.
+    Always returns a version string. Uses cog's --fallback flag to return
+    "0.0.0" when no tags exist (initial release scenario).
     """
     start_group("Determine previous version")
 
-    if not changelog_exists:
-        return "0.0.0"
     try:
-        version = run_cog_command(["get-version"], working_dir)
+        version = run_cog_command(["get-version", "--fallback", "0.0.0"], working_dir)
         info(f"Current version: {version}")
         end_group()
         return version  # noqa: TRY300
     except ReleaseWithCogError as e:
         warning(f"Failed to get version from cog: {e}")
         end_group()
-        return ""
+        return "0.0.0"
 
 
 def compute_next_dev_version(working_dir: str, dev_version_suffix: str = "_dev") -> str:
@@ -444,8 +443,25 @@ def compute_next_dev_version(working_dir: str, dev_version_suffix: str = "_dev")
                 end_group()
                 return dev_version
 
-        # Fallback: use current version with suffix
-        current_version = get_cog_version(working_dir=working_dir, changelog_exists=True)
+        # Fallback 2: try --auto --dry-run (handles no-tag case)
+        result = subprocess.run(
+            ["cog", "bump", "--auto", "--dry-run"],
+            check=False,
+            cwd=working_dir,
+            capture_output=True,
+            text=True,
+        )
+
+        if result.returncode == 0 and result.stdout.strip():
+            next_version = result.stdout.strip()
+            if re.match(r"^\d+\.\d+\.\d+$", next_version):
+                dev_version = f"{next_version}{dev_version_suffix}"
+                info(f"Next dev version (auto fallback): {dev_version}")
+                end_group()
+                return dev_version
+
+        # Fallback 3: use current version with suffix
+        current_version = get_cog_version(working_dir=working_dir)
         if current_version and re.match(r"^\d+\.\d+\.\d+$", current_version):
             dev_version = f"{current_version}{dev_version_suffix}"
             info(f"Next dev version (fallback to current): {dev_version}")
@@ -454,9 +470,9 @@ def compute_next_dev_version(working_dir: str, dev_version_suffix: str = "_dev")
 
         warning("Failed to compute next dev version")
         end_group()
-        return ""
+        return ""  # noqa: TRY300
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         warning(f"Error computing next dev version: {e}")
         end_group()
         return ""
@@ -546,7 +562,7 @@ def get_tag_prefix() -> str:
         return ""
 
 
-def generate_changelog(  # noqa: PLR0913
+def generate_changelog(  # noqa: PLR0913, C901
     inputs: dict[str, str],
     remote: str,
     owner: str,
@@ -585,8 +601,28 @@ def generate_changelog(  # noqa: PLR0913
 
     info(f"Generating changelog with: cog {' '.join(args)}")
 
-    changelog = run_cog_command(args)
-    info("Changelog generated successfully")
+    try:
+        changelog = run_cog_command(args)
+        info("Changelog generated successfully")
+    except ReleaseWithCogError as e:
+        if is_pr_event:
+            raise
+        # Safety net: normally --at works after cog bump creates the tag.
+        # This fallback fires if bump didn't create the expected tag
+        # (e.g., initial release edge cases).
+        warning(
+            f"Changelog generation with --at failed ({e}). "
+            "Falling back to full-history changelog (expected on initial release).",
+        )
+        fallback_args = ["changelog"]
+        if inputs["cog_changelog_args"].strip():
+            fallback_args.extend(inputs["cog_changelog_args"].strip().split())
+        if remote and owner and repo:
+            fallback_args.extend(
+                ["--remote", remote, "--owner", owner, "--repository", repo],
+            )
+        changelog = run_cog_command(fallback_args)
+        info("Changelog generated successfully (full-history fallback)")
 
     end_group()
 
@@ -680,8 +716,8 @@ def post_pr_comment(  # noqa: C901, PLR0912, PLR0913, PLR0915
         comment_body = f"""{comment_header}
 
 **📦 Version Information**
-- Current version: `{current_version or 'Unknown'}`
-- Previous version: `{previous_version or 'Unknown'}`
+- Current version: `{current_version or "Unknown"}`
+- Previous version: `{previous_version or "Unknown"}`
 
 {changelog}
 
@@ -827,7 +863,7 @@ def create_forgejo_release(
         return None
 
 
-def main() -> None:
+def main() -> None:  # noqa: PLR0915
     """Orchestrate the release process."""
     try:
         info("Starting release-with-cog Python implementation")
@@ -835,11 +871,7 @@ def main() -> None:
         # Detect event type
         is_pr = is_pull_request_event()
         info(f"Event type: {'Pull Request' if is_pr else 'Main Branch'}")
-
-        changelog_exists = Path("CHANGELOG.md").is_file()
-        if not changelog_exists:
-            warning("No CHANGELOG.md found in the repository. Setting version to 0.0.0")
-            set_output("previous_version", "0.0.0")
+        debug(f"CHANGELOG.md exists: {Path('CHANGELOG.md').is_file()}")
 
         # Get action inputs
         inputs = get_action_inputs()
@@ -855,8 +887,10 @@ def main() -> None:
             info("Processing PR event - generating changelog and posting comment")
 
             # Get current and previous versions for display
-            current_version = get_cog_version(working_dir=working_dir, changelog_exists=changelog_exists)
+            current_version = get_cog_version(working_dir=working_dir)
             previous_version = current_version  # For PRs, we don't bump version
+            if previous_version == "0.0.0":
+                notice("🎉 Initial release detected — starting from 0.0.0")
 
             # Generate changelog for PR
             changelog = generate_changelog(
@@ -915,7 +949,9 @@ def main() -> None:
             )
 
             # Get previous version
-            previous_version = get_cog_version(working_dir=working_dir, changelog_exists=changelog_exists)
+            previous_version = get_cog_version(working_dir=working_dir)
+            if previous_version == "0.0.0":
+                notice("🎉 Initial release detected — starting from 0.0.0")
             set_output(name="previous_version", value=previous_version)
 
             # Bump version
