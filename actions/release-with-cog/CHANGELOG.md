@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## release-with-cog-0.4.1 - 2026-07-17
+#### Bug Fixes
+- apply changelog fallback on PR events too (initial release) - (d83af61) - Oluf Lorenzen
+
+- - -
+
 ## release-with-cog-0.4.0 - 2026-07-17
 #### Features
 - (**release-with-cog**) handle initial release gracefully (no tags, no CHANGELOG) - (0a664d9) - Oluf Lorenzen
