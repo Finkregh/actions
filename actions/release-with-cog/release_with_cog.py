@@ -605,17 +605,17 @@ def generate_changelog(  # noqa: PLR0913, C901
         changelog = run_cog_command(args)
         info("Changelog generated successfully")
     except ReleaseWithCogError as e:
-        if is_pr_event:
-            raise
-        # Safety net: normally --at works after cog bump creates the tag.
-        # This fallback fires if bump didn't create the expected tag
-        # (e.g., initial release edge cases).
+        # Fallback: retry without the revision-specific args (--at tag or
+        # PR pattern like origin/main..HEAD) to produce a full-history changelog.
+        # This fires on initial release when the target revision doesn't exist yet.
         warning(
-            f"Changelog generation with --at failed ({e}). "
+            f"Changelog generation failed ({e}). "
             "Falling back to full-history changelog (expected on initial release).",
         )
         fallback_args = ["changelog"]
-        if inputs["cog_changelog_args"].strip():
+        if is_pr_event and inputs["cog_changelog_args_pr"].strip():
+            fallback_args.extend(inputs["cog_changelog_args_pr"].strip().split())
+        elif inputs["cog_changelog_args"].strip():
             fallback_args.extend(inputs["cog_changelog_args"].strip().split())
         if remote and owner and repo:
             fallback_args.extend(
