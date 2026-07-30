@@ -56,4 +56,4 @@ jobs:
         with:
           fetch-depth: 1
       - uses: https://code.forgejo.org/actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - uses: https://github.com/typesafegithub/github-actions-typing@184d97003b1300f6a10e286eb98c191e416ff02b # v2.2.1
+      - uses: https://github.com/typesafegithub/github-actions-typing@v2.2.1
