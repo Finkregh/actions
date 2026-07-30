@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## ci-0.4.1 - 2026-07-30
+#### Continuous Integration
+- use current branch - (aa4ef4d) - Oluf Lorenzen
+#### Miscellaneous Chores
+- (**deps**) update https://code.forgejo.org/actions/checkout digest to fbc6f39 - (2648464) - renovate-forgejo
+- (**deps**) update https://code.forgejo.org/actions/checkout digest to 3d3c42e - (d728135) - renovate-forgejo
+- (**deps**) update https://code.forgejo.org/actions/checkout digest to fbc6f39 - (5d8d27e) - renovate-forgejo
+- (**deps**) update actions/checkout digest to fbc6f39 - (9a5168f) - renovate-forgejo
+- (**deps**) update https://code.forgejo.org/actions/checkout digest to 93cb6ef - (bd013d4) - Renovate Bot
+- (**deps**) update https://code.forgejo.org/actions/checkout digest to de0fac2 - (7275b64) - renovate-forgejo
+
+- - -
+
 ## ci-0.4.0 - 2026-05-12
 #### Features
 - (**release-with-cog**) allow passing different args - (c146ec8) - Oluf Lorenzen

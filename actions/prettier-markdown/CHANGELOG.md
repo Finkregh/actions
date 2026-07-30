@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## prettier-markdown-0.1.1 - 2026-07-30
+#### Miscellaneous Chores
+- (**deps**) update actions/checkout digest to fbc6f39 - (9a5168f) - renovate-forgejo
+- bump markdownlint action - (865239e) - finkregh
+
+- - -
+
 ## prettier-markdown-0.1.0 - 2026-05-12
 #### Features
 - (**prettier-markdown**) add new options - (644c001) - Oluf Lorenzen

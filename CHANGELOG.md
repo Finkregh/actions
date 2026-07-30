@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [3.4.2](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/3.4.1..3.4.2) - 1970-01-01
+### Package updates
+- [prettier-markdown-0.1.1](actions/prettier-markdown) bumped to [prettier-markdown-0.1.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/prettier-markdown-0.1.0..prettier-markdown-0.1.1)
+- [ci-0.4.1](.forgejo/workflows) bumped to [ci-0.4.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/ci-0.4.0..ci-0.4.1)
+### Global changes
+
+- - -
+
 ## [3.4.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/3.4.0..3.4.1) - 1970-01-01
 ### Package updates
 - [release-with-cog-0.4.1](actions/release-with-cog) bumped to [release-with-cog-0.4.1](https://https://git.h.oluflorenzen.de/finkregh/action-hugo-build-rsync/compare/release-with-cog-0.4.0..release-with-cog-0.4.1)
