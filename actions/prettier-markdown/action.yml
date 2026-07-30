@@ -107,7 +107,7 @@ runs:
         echo "::endgroup::"
 
     - name: Markdownlint
-      uses: https://github.com/DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20
+      uses: https://github.com/DavidAnson/markdownlint-cli2-action@v24.1.0
       continue-on-error: true
       with:
         fix: true
