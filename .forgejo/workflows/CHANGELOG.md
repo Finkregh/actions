@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## ci-0.4.2 - 2026-11-06
+#### Bug Fixes
+- (**ci**) make YAML shellcheck clean - (be2d9b8) - Oluf Lorenzen
+#### Miscellaneous Chores
+- (**deps**) update https://code.forgejo.org/actions/checkout digest to 3d3c42e - (25a083a) - renovate-forgejo
+
+- - -
+
 ## ci-0.4.1 - 2026-07-30
 #### Continuous Integration
 - use current branch - (aa4ef4d) - Oluf Lorenzen

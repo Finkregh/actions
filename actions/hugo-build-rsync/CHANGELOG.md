@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## hugo-build-rsync-0.3.5 - 2026-11-06
+#### Bug Fixes
+- (**ci**) make YAML shellcheck clean - (be2d9b8) - Oluf Lorenzen
+
+- - -
+
 ## hugo-build-rsync-0.3.4 - 2026-04-30
 #### Miscellaneous Chores
 - (**deps**) pin dependencies - (de6001b) - Renovate Bot

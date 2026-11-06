@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## release-with-cog-0.5.0 - 2026-11-06
+#### Features
+- (**release-with-cog**) add package tag changelog token - (8197058) - Oluf Lorenzen
+#### Bug Fixes
+- (**ci**) make YAML shellcheck clean - (be2d9b8) - Oluf Lorenzen
+- (**release-with-cog**) emit release URL output safely - (813c133) - Oluf Lorenzen
+#### Miscellaneous Chores
+- changes from ci - (d1e8aed) - Oluf Lorenzen
+
+- - -
+
 ## release-with-cog-0.4.1 - 2026-07-17
 #### Bug Fixes
 - apply changelog fallback on PR events too (initial release) - (d83af61) - Oluf Lorenzen
