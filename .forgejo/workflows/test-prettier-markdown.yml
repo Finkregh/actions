@@ -110,7 +110,7 @@ jobs:
           fi
 
           # Check if prettier ran on shell script
-          if grep -q 'if \[ "$1" = "test" \];then' test-files/test.sh; then
+          if grep -Fq "if [ \"\$1\" = \"test\" ];then" test-files/test.sh; then
             echo "ERROR: Shell script was not formatted properly"
             exit 1
           else

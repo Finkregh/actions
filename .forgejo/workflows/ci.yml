@@ -45,7 +45,7 @@ jobs:
           uv pip install git+https://github.com/mschuett/yaml-shellcheck.git@v1.8.0
       - name: yaml-shellcheck
         shell: bash
-        run: find . -name \*.yaml -or -name \*.yml | xargs yaml_shellcheck --shell '#!/bin/bash -e' --command 'shellcheck --color=always'
+        run: find . \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 yaml_shellcheck --shell '#!/bin/bash -e' --command 'shellcheck --color=always'
 
   validate-action-types:
     runs-on: "ubuntu-latest"
