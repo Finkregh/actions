@@ -64,10 +64,12 @@ runs:
       run: |
         echo "::group::Install prettier and plugins"
         PRETTIER_DIR=$(mktemp -d)
-        pushd "$PRETTIER_DIR"
+        pushd "$PRETTIER_DIR" || exit 1
         npm init -y > /dev/null 2>&1
+        # prettier_plugins is intentionally a space-separated package list.
+        # shellcheck disable=SC2086
         npm install prettier ${{ inputs.prettier_plugins }}
-        popd
+        popd || exit 1
         echo "::endgroup::"
 
         echo "::group::Prettifying files..."
@@ -98,6 +100,8 @@ runs:
           echo "::warning::Ensure your prettier config includes the plugins: $PLUGINS_DISPLAY"
         fi
 
+        # prettier_options is intentionally a space-separated CLI option list.
+        # shellcheck disable=SC2086
         NODE_PATH="$PRETTIER_DIR/node_modules" "$PRETTIER_DIR/node_modules/.bin/prettier" ${{ inputs.prettier_options }}
 
         if [ "$GENERATED_CONFIG" = true ]; then

@@ -121,26 +121,27 @@ runs:
         HUGO_DOMAIN="${{ inputs.main_domain }}"
         RSYNC_DEST_DIR="${{ inputs.main_rsync_destination_dir }}"
 
-        # shellcheck disable=SC2050
+        # The action expressions below are expanded by Forgejo before Bash runs.
+        # shellcheck disable=SC2034,SC2236
         if [ "${{ github.event_name }}" == "pull_request" ]; then
-          if [ ! -z "${RSYNC_ARGS_PR+x}" ] ; then RSYNC_ARGS=${RSYNC_ARGS_PR} ; fi
-          if [ ! -z "${RSYNC_SERVER_PR+x}" ] ; then RSYNC_SERVER=${RSYNC_SERVER_PR} ; fi
-          if [ ! -z "${RSYNC_USER_PR+x}" ] ; then RSYNC_USER=${RSYNC_USER_PR} ; fi
-          if [ ! -z "${RSYNC_RSH_PR+x}" ] ; then RSYNC_RSH=${RSYNC_RSH_PR} ; fi
+          if [ -n "${RSYNC_ARGS_PR+x}" ]; then RSYNC_ARGS=${RSYNC_ARGS_PR}; fi
+          if [ -n "${RSYNC_SERVER_PR+x}" ]; then RSYNC_SERVER=${RSYNC_SERVER_PR}; fi
+          if [ -n "${RSYNC_USER_PR+x}" ]; then RSYNC_USER=${RSYNC_USER_PR}; fi
+          if [ -n "${RSYNC_RSH_PR+x}" ]; then RSYNC_RSH=${RSYNC_RSH_PR}; fi
           HTTP_PROTOCOL="${{ inputs.pr_protocol }}"
           HUGO_DOMAIN="${{ inputs.pr_subdomain }}-pr-${{ github.event.number }}.${{ inputs.pr_domain }}"
           RSYNC_DEST_DIR="${{ inputs.pr_rsync_destination_basedir }}${HUGO_DOMAIN}"
         elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref_name }}" != "${{ github.event.repository.default_branch }}" ]; then
           # Handle push to non-default branch - use PR-like configuration but with branch name
+          if [ -n "${RSYNC_ARGS_PR+x}" ]; then RSYNC_ARGS=${RSYNC_ARGS_PR}; fi
           # shellcheck disable=SC2034
-          if [ ! -z "${RSYNC_ARGS_PR+x}" ] ; then RSYNC_ARGS=${RSYNC_ARGS_PR} ; fi
+          if [ -n "${RSYNC_SERVER_PR+x}" ]; then RSYNC_SERVER=${RSYNC_SERVER_PR}; fi
           # shellcheck disable=SC2034
-          if [ ! -z "${RSYNC_SERVER_PR+x}" ] ; then RSYNC_SERVER=${RSYNC_SERVER_PR} ; fi
+          if [ -n "${RSYNC_USER_PR+x}" ]; then RSYNC_USER=${RSYNC_USER_PR}; fi
           # shellcheck disable=SC2034
-          if [ ! -z "${RSYNC_USER_PR+x}" ] ; then RSYNC_USER=${RSYNC_USER_PR} ; fi
-          # shellcheck disable=SC2034
-          if [ ! -z "${RSYNC_RSH_PR+x}" ] ; then RSYNC_RSH=${RSYNC_RSH_PR} ; fi
+          if [ -n "${RSYNC_RSH_PR+x}" ]; then RSYNC_RSH=${RSYNC_RSH_PR}; fi
           # Replace '/' with '_' in branch name for domain-safe naming
+          # shellcheck disable=SC2034
           BRANCH_NAME_SAFE=$(echo "${{ github.ref_name }}" | sed 's/\//_/g')
           # shellcheck disable=SC2034
           HTTP_PROTOCOL="${{ inputs.pr_protocol }}"
@@ -162,8 +163,12 @@ runs:
       run: |
         set -x
         set -euo pipefail
+        # The GitHub expression is intentionally a literal until Forgejo expands it.
+        # shellcheck disable=SC2016
         printf 'Running commands before build: ${{ inputs.pre-build-cmds }}\n'
 
+        # The GitHub expression is intentionally a literal until Forgejo expands it.
+        # shellcheck disable=SC2016
         while IFS=$'\n' read -r command; do
             echo "Running: ${command}"
             eval "${command}"
@@ -215,27 +220,38 @@ runs:
         if ! grep -q "${RSYNC_SERVER}" ~/.ssh/known_hosts; then echo "::error::${RSYNC_SERVER} is not in ~/.ssh/known_hosts" ; exit 1 ; fi
 
         eval "$(ssh-agent -s)"
+        # The GitHub expression is intentionally a literal until Forgejo expands it.
+        # shellcheck disable=SC2016
         echo '${{ inputs.ssh_secret_key }}' | ssh-add -
 
         echo "::group::Running rsync"
         _rsync_exit=0
         echo -e '### Rsync output\n\n```' > "$GITHUB_STEP_SUMMARY"
         set -x
+        # rsync args are intentionally provided as a space-separated option list.
+        # shellcheck disable=SC2086
         rsync ${RSYNC_ARGS} ./public/* "${RSYNC_USER}@${RSYNC_SERVER}:${RSYNC_DEST_DIR}" 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" || _rsync_exit=${PIPESTATUS[0]}
         set +x
         echo -e '\n```\n\n' >> "$GITHUB_STEP_SUMMARY"
         if [ ! "${_rsync_exit}" == 0 ]; then
           echo "::warning::rsync failed with code ${_rsync_exit}, running again with 'RSYNC_RSH={RSYNC_RSH} -v'"
           echo -e '### Rsync output with RSYNC_RSH appended with -v\n\n```' >> "$GITHUB_STEP_SUMMARY"
+          # shellcheck disable=SC2086
           RSYNC_RSH="${RSYNC_RSH} -v" rsync ${RSYNC_ARGS} ./public/* "${RSYNC_USER}@${RSYNC_SERVER}:${RSYNC_DEST_DIR}" | tee -a "$GITHUB_STEP_SUMMARY"
           echo -e '\n```' >> "$GITHUB_STEP_SUMMARY"
           echo "::error::rsync failed with ${_rsync_exit}"
+          # shellcheck disable=SC2086
           exit ${_rsync_exit}
         fi
         echo "::endgroup::"
 
     - name: Link to website, add PR comment
       shell: bash
+      env:
+        FORGEJO_CURL_SOURCE: ${{ inputs.forgejo_curl_source }}
+        FORGEJO_SERVER_URL: ${{ env.GITHUB_SERVER_URL }}
+        FORGEJO_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
+        PR_NUMBER: ${{ github.event.number }}
       run: |
         set -euo pipefail
         echo "::notice::Build is accessible at ${HUGO_BASEURL}" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -244,14 +260,17 @@ runs:
         if [ "${{ github.event_name }}" == "pull_request" ]; then
           echo "This is a PR, adding a comment if it hasnt been created yet"
           echo "::group::Creating comment on PR"
-          curl --fail -sS -o /usr/local/bin/forgejo-curl.sh ${{ inputs.forgejo_curl_source }} && chmod +x /usr/local/bin/forgejo-curl.sh
-          export PATH=/usr/local/bin:$PATH
-          forgejo-curl.sh --token "${{ env.GITHUB_TOKEN }}" login ${{ env.GITHUB_SERVER_URL }}
-          forgejo-curl.sh api_json ${{ env.GITHUB_SERVER_URL }}/api/v1/user
-          if forgejo-curl.sh --verbose api ${{ env.GITHUB_SERVER_URL }}/api/v1/repos/${{ env.GITHUB_REPOSITORY }}/issues/${{ github.event.number }}/comments | grep -q "Website preview" ; then
+          curl --fail -sS -o /usr/local/bin/forgejo-curl.sh "$FORGEJO_CURL_SOURCE"
+          chmod +x /usr/local/bin/forgejo-curl.sh
+          export PATH="/usr/local/bin:${PATH}"
+          forgejo-curl.sh --token "$GITHUB_TOKEN" login "$FORGEJO_SERVER_URL"
+          forgejo-curl.sh api_json "${FORGEJO_SERVER_URL}/api/v1/user"
+          comment_url="${FORGEJO_SERVER_URL}/api/v1/repos/${FORGEJO_REPOSITORY}/issues/${PR_NUMBER}/comments"
+          if forgejo-curl.sh --verbose api "$comment_url" | grep -q "Website preview"; then
             echo "Comment already created"
           else
-            forgejo-curl.sh --verbose api_json --data-raw '{"body":"Website preview: ${{ env.HUGO_BASEURL }}"}' ${{ env.GITHUB_SERVER_URL }}/api/v1/repos/${{ env.GITHUB_REPOSITORY }}/issues/${{ github.event.number }}/comments
+            comment_body=$(jq -nc --arg url "$HUGO_BASEURL" '{body: "Website preview: \($url)"}')
+            forgejo-curl.sh --verbose api_json --data-raw "$comment_body" "$comment_url"
           fi
           echo "::endgroup::"
         else
