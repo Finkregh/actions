@@ -83,7 +83,7 @@ outputs:
     value: ${{ steps.release_with_cog.outputs.changelog }}
     description: Changelog since last release in markdown
   forgejo_release_url:
-    value: ${{ fromJson(steps.release_with_cog.outputs.forgejo_release_output).html_url }}
+    value: ${{ steps.release_with_cog.outputs.forgejo_release_url }}
     description: |
       URL of the created Forgejo release.
       Example: https://forgejo.example.com/owner/repo/releases/tag/v1.2.3

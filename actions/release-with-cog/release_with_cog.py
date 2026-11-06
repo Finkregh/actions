@@ -18,7 +18,7 @@ from pathlib import Path
 try:
     import requests
     import tomllib
-    from github_action_toolkit import (
+    from github_action_toolkit import (  # pyright: ignore[reportMissingImports]
         debug,
         end_group,
         error,
@@ -868,6 +868,7 @@ def create_forgejo_release(
             f"{server_url}/{owner}/{repo}/releases/tag/{full_tag}",
         )
         info(f"Forgejo release created successfully: {release_url}")
+        set_output("forgejo_release_url", release_url)
 
         # Create a simple dict representation for JSON output
         release_dict = {
@@ -899,6 +900,9 @@ def main() -> None:  # noqa: PLR0915
 
         # Get action inputs
         inputs = get_action_inputs()
+
+        # Always emit a defined release URL output, including for PR and skipped-release paths.
+        set_output("forgejo_release_url", "")
 
         # Set default values
         remote, owner, repo = set_default_values(inputs=inputs)
