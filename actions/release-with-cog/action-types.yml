@@ -30,6 +30,8 @@ inputs:
     type: string
   comment_footer:
     type: string
+  package_tag_changelog_token:
+    type: string
   forgejo_token:
     type: string
   forgejo_server_url:
